@@ -3,6 +3,7 @@ import numpy as np
 import scipy
 from typing import Callable 
 
+
 class IteratedLeastSquares:
     """Solve nonlinear least squares problem
     

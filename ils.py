@@ -26,7 +26,7 @@ class IteratedLeastSquares:
         self,
         initial_parameters: np.ndarray,
         measurements: np.ndarray,
-        sensor_noise: np.ndarray,
+        measurement_noise: np.ndarray,
         tol: float,
         max_iterations: int,
         model: Callable,
@@ -34,7 +34,7 @@ class IteratedLeastSquares:
     ):
 
         self.initial_parameters = initial_parameters
-        self.sensor_noise = sensor_noise
+        self.measurement_noise = measurement_noise
         self.tol = tol
         self.max_iterations = max_iterations
         self.measurements = measurements
@@ -62,9 +62,8 @@ class IteratedLeastSquares:
         return self.linearized_model(*args, **kwargs)
 
     def measurement_error_covariance(self):
-        """Provided measurement standard deviations (since we consider measurements to be IID and uncorrelated) only a diagonal matrix
-        In the future may need to update this equation"""
-        return np.eye(len(self.measurements)) * self.sensor_noise**2
+        n = self.measurements.size  # or len(self.measurements)
+        return np.eye(n) * (self.measurement_noise ** 2)
 
     def covariance_matrix_P(self, H: np.ndarray):
         """Estimation error covariance matrix"""
@@ -76,15 +75,14 @@ class IteratedLeastSquares:
         return P
 
     def iteration(self, x_current, measurements, *args, **kwargs):
-
         predicted = self.model_equation(x_current, *args, **kwargs)
-        residuals = measurements - predicted.T
+        residuals = measurements - predicted[:, np.newaxis]
         H = self.jacobian(x_current, *args, **kwargs)
         P = self.covariance_matrix_P(H)
         R = self.measurement_error_covariance()  # sensor noise
         R_inv = np.linalg.pinv(R)
         K = P @ H.T @ R_inv
-        correction_term = K @ residuals  # gauss-markov solution
+        correction_term = K @ residuals # gauss-markov solution
         x_hat = (
             x_current + correction_term
         )  # current parameter estimate + correction term = x_estimate
@@ -107,3 +105,13 @@ class IteratedLeastSquares:
             x_current = x_estimate
 
         return x_current
+
+
+def model_equation_range_rate(grid_point, aircraft_positions, aircraft_velocity):
+    grid_emitter = np.array([grid_point[0], grid_point[1], 0.0])
+    range_rate = np.zeros((aircraft_positions.shape[0], 1))
+    for i, aircraft_position in enumerate(aircraft_positions):
+        range_rate[i] = np.dot(
+            aircraft_velocity[i], aircraft_position - grid_emitter
+        ) / np.linalg.norm(aircraft_position - grid_emitter)
+    return range_rate

@@ -1,14 +1,15 @@
 import numpy as np
 
+
 class UnitConverter:
     """
-    A basic unit-conversion helper class. 
+    A basic unit-conversion helper class.
     Supports scalar, list, and numpy array inputs.
     """
 
     FEET_TO_METERS = 0.3048
     METERS_TO_FEET = 1 / FEET_TO_METERS
-    
+
     NM_TO_METERS = 1852.0
     METERS_TO_NM = 1 / NM_TO_METERS
 

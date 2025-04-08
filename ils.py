@@ -63,7 +63,7 @@ class IteratedLeastSquares:
 
     def measurement_error_covariance(self):
         n = self.measurements.size  # or len(self.measurements)
-        return np.eye(n) * (self.measurement_noise ** 2)
+        return np.eye(n) * (self.measurement_noise**2)
 
     def covariance_matrix_P(self, H: np.ndarray):
         """Estimation error covariance matrix"""
@@ -82,7 +82,7 @@ class IteratedLeastSquares:
         R = self.measurement_error_covariance()  # sensor noise
         R_inv = np.linalg.pinv(R)
         K = P @ H.T @ R_inv
-        correction_term = K @ residuals # gauss-markov solution
+        correction_term = K @ residuals  # gauss-markov solution
         x_hat = (
             x_current + correction_term
         )  # current parameter estimate + correction term = x_estimate

@@ -1,7 +1,8 @@
 import scipy
 import numpy as np
 
-def plot_error_ellipse(P, center=(0,0), confidence=0.95, ax=None):
+
+def plot_error_ellipse(P, center=(0, 0), confidence=0.95, ax=None):
     # P = UDU.T
     eigenvalues, eigenvectors = np.linalg.eig(P)
     semi_major_vector = eigenvectors[:, eigenvalues.argmax()]
@@ -21,9 +22,7 @@ def plot_error_ellipse(P, center=(0,0), confidence=0.95, ax=None):
             * chi2_val
         )
     )
-    ellipse_points = (
-        np.array([semi_major_vector, semi_minor_vector]).T @ D @ ellipse
-    )
+    ellipse_points = np.array([semi_major_vector, semi_minor_vector]).T @ D @ ellipse
     ellipse_points[0, :] += center[0]
     ellipse_points[1, :] += center[1]
     semi_major = semi_major_vector * np.sqrt(

@@ -2,6 +2,7 @@ import numpy as np
 
 SPEED_OF_LIGHT = 299_792_458.0
 
+
 def model_equation_rr(emitter_estimate_position, sat_position, sat_velocity):
     # range rate = rho_dot * rho_hat = (sat_velocity - emitter veloicty) * (sat_position - emitter position)/norm(sat_position - emitter position)
     # Since emitter velocity is 0 we have
@@ -32,15 +33,19 @@ def model_equation_range_difference(x_old, sensor_positions):
 
     return psedorange_estimate
 
-def model_equation_doa(x_old, aircraft_positions):
-    """DOA Model"""
-    angles = np.arctan2(
-        x_old[1] - aircraft_positions[:, 1],
-        x_old[0] - aircraft_positions[:, 0],
-    )
-    return angles
 
-def model_equation_foa(parameter_estimate,aircraft_position, aircraft_velocity):
+def model_equation_doa(estimate_location, sensor_location, bias=0):
+    """2 d for now"""
+    return (
+        np.arctan2(
+            estimate_location[1] - sensor_location[:, 1],
+            estimate_location[0] - sensor_location[:, 0]
+        )
+        + bias
+    )
+
+
+def model_equation_foa(parameter_estimate, aircraft_position, aircraft_velocity):
     frequency = parameter_estimate[3]
     predicted_frequency = frequency * (
         1
@@ -52,6 +57,3 @@ def model_equation_foa(parameter_estimate,aircraft_position, aircraft_velocity):
         )
     )
     return predicted_frequency.flatten()
-
-
-
